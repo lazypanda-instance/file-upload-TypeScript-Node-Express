@@ -1,0 +1,58 @@
+service: nodejs-with-typescript-demo
+
+plugins:
+ - serverless-offline
+ - serverless-deployment-bucket
+
+custom:
+  secrets: ${file(secrets.json)}
+  deploymentBucket:
+    versioning: true
+  headers:
+    - Content-Type
+    - Authorization
+    - X-Api-Key
+
+provider:
+  name: aws
+  stage: dev
+  runtime: nodejs12.x
+  region: ap-south-1
+  environment:
+    NODE_ENV: ${self:custom.secrets.NODE_ENV}
+    PGDATABASE: ${self:custom.secrets.DB_NAME}
+    PGUSER: ${self:custom.secrets.DB_USER}
+    PGPASSWORD: ${self:custom.secrets.DB_PASSWORD}
+    PGHOST: ${self:custom.secrets.DB_HOST}
+    PGPORT: ${self:custom.secrets.DB_PORT}
+  vpc:
+    securityGroupIds:
+      - ${self:custom.secrets.SECURITY_GROUP_ID}
+    subnetIds:
+      - ${self:custom.secrets.SUBNET1_ID}
+      - ${self:custom.secrets.SUBNET2_ID}
+      - ${self:custom.secrets.SUBNET3_ID}
+  deploymentBucket:
+    name: tutorial-mw-dv
+    serverSideEncryption: AES256
+  apiKeys:
+    - dev-tutorial-mw-api-key
+  usagePlan:
+    quota:
+      limit: 5000
+      offset: 2
+      period: MONTH
+    throttle:
+      burstLimit: 200
+      rateLimit: 100
+
+functions:
+  profileRoute:
+    handler: dist/serverless-handler/handler.profileRoute
+    events:
+      - http:
+          path: /api/v1/profile
+          method: get
+          cors:
+            headers: ${self:custom.headers}
+          private: true
