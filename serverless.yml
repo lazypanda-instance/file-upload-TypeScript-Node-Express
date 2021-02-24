@@ -56,3 +56,12 @@ functions:
           cors:
             headers: ${self:custom.headers}
           private: true
+  uploadImageRoute:
+    handler: dist/serverless-handler/handler.uploadImageRoute
+    events:
+      - http:
+          path: /api/v1/uploadImages
+          method: post
+          cors:
+            headers: ${self:custom.headers}
+          private: true

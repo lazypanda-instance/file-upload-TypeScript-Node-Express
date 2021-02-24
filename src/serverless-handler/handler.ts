@@ -5,8 +5,6 @@ import { parser, uploadFile } from './formdata-parser';
 let response: ProxyResult
 
 const ALLOWED_ORIGINS = [
-    'https://lazypandatech.com',
-    'https://api.lazypandatech.com',
 	'http://localhost:4500'
 ];
 
